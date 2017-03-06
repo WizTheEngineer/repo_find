@@ -1,0 +1,21 @@
+<resources>
+    <string name="app_name">GitHub Search</string>
+
+    <!-- Navigation Drawer -->
+    <string name="nav_open">Open Drawer</string>
+    <string name="nav_close">Close Drawer</string>
+
+    <!-- Search -->
+    <string name="search_activity_title">Search</string>
+    <string name="search">Search</string>
+    <string name="search_hint">Search repositories</string>
+    <string name="empty_view_message">Search repositories</string>
+
+    <plurals name="search_results_found">
+        <item quantity="one">Showing: %d result for</item>
+        <item quantity="other">Showing: %d results for</item>
+    </plurals>
+
+    <!-- Thank You -->
+    <string name="thank_you_activity_title">Thank You!</string>
+</resources>

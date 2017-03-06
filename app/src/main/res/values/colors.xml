@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#64CCEF</color>
+    <color name="colorPrimaryDark">#468EA6</color>
+    <color name="colorAccent">#EF8764</color>
+
+    <!-- Repo Colors -->
+    <color name="main_gray">#6C6C6C</color>
+</resources>
