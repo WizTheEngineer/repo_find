@@ -3,6 +3,7 @@ package com.waynebjackson.githubsearch.search;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
@@ -37,7 +38,8 @@ import timber.log.Timber;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 // TODO: Check for network connection
-public class SearchActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<RepoCollection> {
+public class SearchActivity extends AppCompatActivity implements
+        LoaderManager.LoaderCallbacks<RepoCollection>, RepoAdapter.RepoClickListener {
 
     private TextView mResultsCountView;
     private RecyclerView mRepoResultsRecyclerView;
@@ -64,8 +66,9 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         mRepoResultsRecyclerView = (RecyclerView) findViewById(R.id.repo_results_recyclerview);
         mEmptyView = (LinearLayout) findViewById(R.id.empty_view);
 
+        // Setup RecyclerView
         mRepoResultsRecyclerView.setHasFixedSize(true);
-        mRepoAdapter = new RepoAdapter(this);
+        mRepoAdapter = new RepoAdapter(this, this);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRepoResultsRecyclerView.setLayoutManager(layoutManager);
@@ -134,7 +137,7 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
     @Override
     public void onLoadFinished(Loader<RepoCollection> loader, RepoCollection data) {
         if (data == null || data.getRepositories().isEmpty()) {
-            showEmptyView();
+            showNoResults();
         } else {
             showRepositories(data.getRepositories());
         }
@@ -145,20 +148,30 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         Timber.d("[onLoaderReset]");
     }
 
-    private void showEmptyView() {
+    @Override
+    public void onRepoClicked(@NonNull Repo repository) {
+        final String repoUrl = repository.getHtmlUrl();
+        Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(repoUrl));
+        startActivity(browserIntent);
+    }
+
+    private void showNoResults() {
         mRepoAdapter.clearRepos();
-        findViewById(R.id.main_content).setVisibility(View.GONE);
-        mEmptyView.setVisibility(View.VISIBLE);
+        mRepoResultsRecyclerView.setVisibility(View.GONE);
+        mResultsCountView.setVisibility(View.VISIBLE);
+        final String query = mSearchResultLoader.getQuery().toLowerCase();
+        mResultsCountView.setText(getString(R.string.no_results, query));
     }
 
     private void showRepositories(@NonNull List<Repo> repositories) {
-        setResultsCount(repositories);
+        setResultsCountText(repositories);
         mEmptyView.setVisibility(View.GONE);
         findViewById(R.id.main_content).setVisibility(View.VISIBLE);
+        mRepoResultsRecyclerView.setVisibility(View.VISIBLE);
         mRepoAdapter.bindRepos(repositories);
     }
 
-    private void setResultsCount(@NonNull List<Repo> repositories) {
+    private void setResultsCountText(@NonNull List<Repo> repositories) {
         final int count = repositories.size();
         final String countString = getResources().getQuantityString(R.plurals.search_results_found,
                 count, count);
@@ -167,7 +180,6 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
     }
 
     public static class SearchResultLoader extends AsyncTaskLoader<RepoCollection> {
-
         private GithubService mGithubService;
         private RepoCollection mSearchResponse;
         private String mQuery;

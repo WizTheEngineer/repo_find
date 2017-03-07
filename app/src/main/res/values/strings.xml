@@ -18,4 +18,5 @@
 
     <!-- Thank You -->
     <string name="thanks">Thanks BookShout!</string>
+    <string name="no_results">No results found for %1$s.</string>
 </resources>

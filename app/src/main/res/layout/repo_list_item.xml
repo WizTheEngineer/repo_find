@@ -9,6 +9,7 @@
     android:layout_marginRight="@dimen/repo_list_item_margin_horizontal"
     android:layout_marginBottom="@dimen/repo_list_item_margin_vertical"
     android:layout_marginLeft="@dimen/repo_list_item_margin_horizontal"
+    android:foreground="?android:attr/selectableItemBackground"
     card_view:cardCornerRadius="@dimen/repo_cardview_corner_radius">
 
     <LinearLayout

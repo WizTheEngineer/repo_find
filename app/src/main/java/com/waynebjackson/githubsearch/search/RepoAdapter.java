@@ -17,6 +17,8 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 /**
  * Created by Wayne on 3/6/2017.
  */
@@ -25,10 +27,14 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
 
     private LayoutInflater mInflater;
     private List<Repo> mRepositories;
+    private RepoClickListener mRepoClickListener;
 
-    public RepoAdapter(@NonNull Context context) {
+    public RepoAdapter(@NonNull Context context, @NonNull RepoClickListener repoClickListener) {
+        checkNotNull(context);
+        checkNotNull(repoClickListener);
         mInflater = LayoutInflater.from(context);
         mRepositories = Lists.newArrayList();
+        mRepoClickListener = repoClickListener;
     }
 
     @Override
@@ -83,7 +89,7 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
             mLanguageView = (TextView) itemView.findViewById(R.id.repo_language_view);
         }
 
-        public void bindRepo(@NonNull Repo repository) {
+        public void bindRepo(@NonNull final Repo repository) {
             new PicassoFactory().getPicasso(itemView.getContext())
                     .load(repository.getOwner().getAvatarUrl())
                     .placeholder(R.drawable.avatar_placeholder)
@@ -95,6 +101,16 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
             mForkCountView.setText(String.valueOf(repository.getForksCount()));
             mWatcherCountView.setText(String.valueOf(repository.getWatchersCount()));
             mLanguageView.setText(repository.getLanguage());
+            itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mRepoClickListener.onRepoClicked(repository);
+                }
+            });
         }
+    }
+
+    public interface RepoClickListener {
+        void onRepoClicked(@NonNull Repo repository);
     }
 }
