@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
-
-</LinearLayout>
+              android:layout_height="@dimen/nav_header_height"
+              android:textColor="@android:color/white"
+              android:textSize="@dimen/nav_header_textsize"
+              android:text="@string/thanks"
+              android:background="@color/colorAccent"
+              android:gravity="center"/>

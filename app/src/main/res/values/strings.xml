@@ -17,5 +17,5 @@
     </plurals>
 
     <!-- Thank You -->
-    <string name="thank_you_activity_title">Thank You!</string>
+    <string name="thanks">Thanks BookShout!</string>
 </resources>

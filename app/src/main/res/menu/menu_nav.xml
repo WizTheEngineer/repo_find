@@ -4,10 +4,7 @@
         <item
             android:id="@+id/search"
             android:title="@string/search_activity_title"
+            android:icon="@drawable/ic_search_24dp"
             android:checked="true"/>
-
-        <item
-            android:id="@+id/thank_you"
-            android:title="@string/thank_you_activity_title"/>
     </group>
 </menu>

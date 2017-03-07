@@ -2,8 +2,8 @@ package com.waynebjackson.githubsearch.search;
 
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
@@ -23,8 +23,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.waynebjackson.githubsearch.R;
-import com.waynebjackson.githubsearch.data.model.RepoCollection;
 import com.waynebjackson.githubsearch.data.model.Repo;
+import com.waynebjackson.githubsearch.data.model.RepoCollection;
 import com.waynebjackson.githubsearch.data.service.GithubService;
 import com.waynebjackson.githubsearch.data.service.GithubServiceFactory;
 
@@ -74,14 +74,17 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
         // Init Search Result Loader
         mSearchResultLoader = (SearchResultLoader) getSupportLoaderManager()
                 .initLoader(0, null, this);
+    }
 
-        Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mSearchResultLoader.executeQuery("Stars");
-            }
-        }, 5000);
+    @Override
+    protected void onNewIntent(Intent intent) {
+        setIntent(intent);
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            mSearchResultLoader.executeQuery(query);
+        } else {
+            super.onNewIntent(intent);
+        }
     }
 
     private void configureNavDrawer(final Toolbar toolbar) {
@@ -125,14 +128,12 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
 
     @Override
     public Loader<RepoCollection> onCreateLoader(int id, Bundle args) {
-        Timber.d("[onCreateLoader]");
         return new SearchResultLoader(this);
     }
 
     @Override
     public void onLoadFinished(Loader<RepoCollection> loader, RepoCollection data) {
-        Timber.d("[onLoadFinished] repos: %s, size: %d", data, data.getRepositories().size());
-        if (data.getRepositories().isEmpty()) {
+        if (data == null || data.getRepositories().isEmpty()) {
             showEmptyView();
         } else {
             showRepositories(data.getRepositories());
@@ -189,7 +190,6 @@ public class SearchActivity extends AppCompatActivity implements LoaderManager.L
 
         @Override
         public RepoCollection loadInBackground() {
-            Timber.d("[loadInBackground] query:%s", mQuery);
             Call<RepoCollection> call = mGithubService.getRepos(mQuery);
             try {
                 Response<RepoCollection> response = call.execute();
