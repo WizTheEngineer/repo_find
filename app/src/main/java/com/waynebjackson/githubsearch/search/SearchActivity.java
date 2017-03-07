@@ -1,16 +1,24 @@
 package com.waynebjackson.githubsearch.search;
 
+import java.io.IOException;
+import java.util.List;
+
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.app.SearchManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +28,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -28,18 +37,19 @@ import com.waynebjackson.githubsearch.data.model.Repo;
 import com.waynebjackson.githubsearch.data.model.RepoCollection;
 import com.waynebjackson.githubsearch.data.service.GithubService;
 import com.waynebjackson.githubsearch.data.service.GithubServiceFactory;
-
-import java.io.IOException;
-import java.util.List;
-
+import com.waynebjackson.githubsearch.utils.NetworkUtils;
 import retrofit2.Call;
 import retrofit2.Response;
 import timber.log.Timber;
 
 import static com.google.common.base.Preconditions.checkNotNull;
-// TODO: Check for network connection
+
 public class SearchActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<RepoCollection>, RepoAdapter.RepoClickListener {
+
+    private static final float THANK_YOU_SCALE_FACTOR = 1.2f;
+    private static final long THANK_YOU_ANIMATION_DURATION = 315;
+    private static final int THANK_YOU_ANIMATION_PULSE_COUNT = 3;
 
     private TextView mResultsCountView;
     private RecyclerView mRepoResultsRecyclerView;
@@ -48,6 +58,10 @@ public class SearchActivity extends AppCompatActivity implements
     private RepoAdapter mRepoAdapter;
 
     private SearchResultLoader mSearchResultLoader;
+    private NavigationView mNavigationView;
+    private TextView mThankYouHeaderView;
+
+    private ObjectAnimator mThankYouAnimator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,6 +79,8 @@ public class SearchActivity extends AppCompatActivity implements
         mResultsCountView = (TextView) findViewById(R.id.results_count_view);
         mRepoResultsRecyclerView = (RecyclerView) findViewById(R.id.repo_results_recyclerview);
         mEmptyView = (LinearLayout) findViewById(R.id.empty_view);
+        mNavigationView = (NavigationView) findViewById(R.id.nav_view);
+        mThankYouHeaderView = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.thankyou_header_view);
 
         // Setup RecyclerView
         mRepoResultsRecyclerView.setHasFixedSize(true);
@@ -90,6 +106,15 @@ public class SearchActivity extends AppCompatActivity implements
         }
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!NetworkUtils.isConnected(this)) {
+            showNoNetworkDialog();
+        }
+
+    }
+
     private void configureNavDrawer(final Toolbar toolbar) {
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
@@ -100,14 +125,19 @@ public class SearchActivity extends AppCompatActivity implements
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
                 toolbar.setTitle(R.string.search_activity_title);
-                invalidateOptionsMenu(); // creates a call to onPrepareOptionsMenu()
+                if (mThankYouAnimator != null && mThankYouAnimator.isRunning()) {
+                    cancelThankYouAnimation();
+                }
+                supportInvalidateOptionsMenu(); // creates a call to onPrepareOptionsMenu();
             }
 
             // Called when a drawer has settled in a completely open state
             @Override
             public void onDrawerOpened(View drawerView) {
+                Timber.d("[onDrawerOpened]");
                 super.onDrawerOpened(drawerView);
-                invalidateOptionsMenu(); // creates a call to onPrepareOptionsMenu()
+                animateThankYou();
+                supportInvalidateOptionsMenu(); // creates a call to onPrepareOptionsMenu()
             }
         };
         drawerLayout.addDrawerListener(drawerToggle);
@@ -177,6 +207,44 @@ public class SearchActivity extends AppCompatActivity implements
                 count, count);
         final String query = mSearchResultLoader.getQuery().toLowerCase();
         mResultsCountView.setText(String.format("%s %s.", countString, query));
+    }
+
+    private void animateThankYou() {
+        if (mThankYouAnimator == null) {
+            mThankYouAnimator = ObjectAnimator.ofPropertyValuesHolder(mThankYouHeaderView,
+                                                                      PropertyValuesHolder.ofFloat("scaleX", THANK_YOU_SCALE_FACTOR),
+                                                                      PropertyValuesHolder.ofFloat("scaleY", THANK_YOU_SCALE_FACTOR));
+            mThankYouAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+            mThankYouAnimator.setDuration(THANK_YOU_ANIMATION_DURATION);
+
+            mThankYouAnimator.setRepeatCount(THANK_YOU_ANIMATION_PULSE_COUNT);
+            mThankYouAnimator.setRepeatMode(ObjectAnimator.REVERSE);
+        }
+        mThankYouAnimator.start();
+    }
+
+    private void cancelThankYouAnimation() {
+        mThankYouAnimator.cancel();
+        mThankYouHeaderView.setScaleX(1f);
+        mThankYouHeaderView.setScaleY(1f);
+    }
+
+    private void showNoNetworkDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.no_network_connection, getString(R.string.app_name)));
+        builder.setCancelable(false);
+
+        builder.setPositiveButton(
+            R.string.ok,
+            new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    dialog.cancel();
+                    finish();
+                }
+            });
+
+        AlertDialog noNetworkDialog = builder.create();
+        noNetworkDialog.show();
     }
 
     public static class SearchResultLoader extends AsyncTaskLoader<RepoCollection> {

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">GitHub Search</string>
+    <string name="app_name">Repo Find</string>
 
     <!-- Navigation Drawer -->
     <string name="nav_open">Open Drawer</string>
@@ -19,4 +19,8 @@
     <!-- Thank You -->
     <string name="thanks">Thanks BookShout!</string>
     <string name="no_results">No results found for %1$s.</string>
+    <string name="ok">Ok</string>
+    <string name="no_network_connection">%1$s needs a network connection to operate properly. Please connect to a network and try
+        again.
+    </string>
 </resources>

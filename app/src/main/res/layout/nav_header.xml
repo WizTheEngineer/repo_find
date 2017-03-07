@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
-          android:layout_width="match_parent"
-          android:layout_height="@dimen/nav_header_height"
-          android:background="@color/colorAccent"
-          android:fontFamily="sans-serif-light"
-          android:gravity="center"
-          android:orientation="vertical"
-          android:text="@string/thanks"
-          android:textColor="@android:color/white"
-          android:textSize="@dimen/nav_header_textsize"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="@dimen/nav_header_height"
+              android:gravity="center"
+              android:orientation="vertical"
+              android:background="@color/colorAccent">
+    <TextView
+        android:id="@+id/thankyou_header_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:text="@string/thanks"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/nav_header_textsize"/>
+</LinearLayout>
