@@ -159,6 +159,7 @@ public class SearchActivity extends AppCompatActivity implements
         return super.onCreateOptionsMenu(menu);
     }
 
+    // Loader Stuff
     @Override
     public Loader<RepoCollection> onCreateLoader(int id, Bundle args) {
         return new SearchResultLoader(this);
@@ -178,6 +179,7 @@ public class SearchActivity extends AppCompatActivity implements
         Timber.d("[onLoaderReset]");
     }
 
+    // Repo Clicks
     @Override
     public void onRepoClicked(@NonNull Repo repository) {
         final String repoUrl = repository.getHtmlUrl();
@@ -185,6 +187,7 @@ public class SearchActivity extends AppCompatActivity implements
         startActivity(browserIntent);
     }
 
+    // UI States
     private void showNoResults() {
         mRepoAdapter.clearRepos();
         mRepoResultsRecyclerView.setVisibility(View.GONE);
@@ -194,6 +197,8 @@ public class SearchActivity extends AppCompatActivity implements
     }
 
     private void showRepositories(@NonNull List<Repo> repositories) {
+        // Scroll to the top
+        mRepoResultsRecyclerView.scrollToPosition(0);
         setResultsCountText(repositories);
         mEmptyView.setVisibility(View.GONE);
         findViewById(R.id.main_content).setVisibility(View.VISIBLE);
@@ -209,6 +214,7 @@ public class SearchActivity extends AppCompatActivity implements
         mResultsCountView.setText(String.format("%s %s.", countString, query));
     }
 
+    // Animations
     private void animateThankYou() {
         if (mThankYouAnimator == null) {
             mThankYouAnimator = ObjectAnimator.ofPropertyValuesHolder(mThankYouHeaderView,
@@ -229,6 +235,7 @@ public class SearchActivity extends AppCompatActivity implements
         mThankYouHeaderView.setScaleY(1f);
     }
 
+    // No Network
     private void showNoNetworkDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setMessage(getString(R.string.no_network_connection, getString(R.string.app_name)));
@@ -247,6 +254,10 @@ public class SearchActivity extends AppCompatActivity implements
         noNetworkDialog.show();
     }
 
+    /***
+     * Loader implementation that handles loading search result from the {@link GithubService} off of the UI thread.
+     * It also caches that last query results.
+     */
     public static class SearchResultLoader extends AsyncTaskLoader<RepoCollection> {
         private GithubService mGithubService;
         private RepoCollection mSearchResponse;

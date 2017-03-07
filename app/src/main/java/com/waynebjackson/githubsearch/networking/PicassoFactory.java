@@ -10,12 +10,17 @@ import com.squareup.picasso.Picasso;
  * Factory responsible for providing configured instance of a {@link Picasso} object.
  */
 public class PicassoFactory {
+
     private static final long CACHE_SIZE = 10 * 1024 * 1024; // 10MB
 
+    private Picasso mPicasso;
+
     public Picasso getPicasso(Context context) {
-        Picasso picasso = new Picasso.Builder(context)
-                .downloader(new OkHttp3Downloader(context, CACHE_SIZE))
-                .build();
-        return picasso;
+        if (mPicasso == null) {
+            mPicasso = new Picasso.Builder(context)
+                           .downloader(new OkHttp3Downloader(context, CACHE_SIZE))
+                           .build();
+        }
+        return mPicasso;
     }
 }

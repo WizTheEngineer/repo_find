@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.TextView;
 
 import com.google.common.collect.Lists;
@@ -28,6 +30,8 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
     private LayoutInflater mInflater;
     private List<Repo> mRepositories;
     private RepoClickListener mRepoClickListener;
+    private int mLastPosition = -1;
+    private PicassoFactory mPicassoFactory;
 
     public RepoAdapter(@NonNull Context context, @NonNull RepoClickListener repoClickListener) {
         checkNotNull(context);
@@ -35,6 +39,7 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
         mInflater = LayoutInflater.from(context);
         mRepositories = Lists.newArrayList();
         mRepoClickListener = repoClickListener;
+        mPicassoFactory = new PicassoFactory();
     }
 
     @Override
@@ -47,6 +52,12 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
     public void onBindViewHolder(RepoViewHolder holder, int position) {
         Repo repository = mRepositories.get(position);
         holder.bindRepo(repository);
+        setAnimation(holder.itemView, position);
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(RepoViewHolder holder) {
+        holder.clearAnimation();
     }
 
     @Override
@@ -55,7 +66,7 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
     }
 
     public void bindRepos(@NonNull List<Repo> repositories) {
-        // TODO: Animate
+        mLastPosition = -1;
         mRepositories.clear();
         mRepositories.addAll(repositories);
         notifyDataSetChanged();
@@ -64,6 +75,17 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
     public void clearRepos() {
         mRepositories.clear();
         notifyDataSetChanged();
+    }
+
+    private void setAnimation(View viewToAnimate, int position)
+    {
+        // If the bound view wasn't previously displayed on screen, it's animated
+        if (position > mLastPosition)
+        {
+            Animation animation = AnimationUtils.loadAnimation(viewToAnimate.getContext(), android.R.anim.slide_in_left);
+            viewToAnimate.startAnimation(animation);
+            mLastPosition = position;
+        }
     }
 
     public class RepoViewHolder extends RecyclerView.ViewHolder {
@@ -90,7 +112,7 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
         }
 
         public void bindRepo(@NonNull final Repo repository) {
-            new PicassoFactory().getPicasso(itemView.getContext())
+            mPicassoFactory.getPicasso(itemView.getContext())
                     .load(repository.getOwner().getAvatarUrl())
                     .placeholder(R.drawable.avatar_placeholder)
                     .into(mOwnerAvatarView);
@@ -107,6 +129,10 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
                     mRepoClickListener.onRepoClicked(repository);
                 }
             });
+        }
+
+        public void clearAnimation() {
+            itemView.clearAnimation();
         }
     }
 
