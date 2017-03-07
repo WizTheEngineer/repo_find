@@ -3,8 +3,11 @@ package com.waynebjackson.githubsearch.search;
 import java.io.IOException;
 import java.util.List;
 
+import com.google.common.base.Preconditions;
+
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.app.ProgressDialog;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -63,6 +66,8 @@ public class SearchActivity extends AppCompatActivity implements
 
     private ObjectAnimator mThankYouAnimator;
 
+    private ProgressDialog mProgressDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,6 +86,12 @@ public class SearchActivity extends AppCompatActivity implements
         mEmptyView = (LinearLayout) findViewById(R.id.empty_view);
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
         mThankYouHeaderView = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.thankyou_header_view);
+
+        mProgressDialog= new ProgressDialog(this, R.style.AppTheme_Dark_Dialog);
+        mProgressDialog.setIndeterminate(true);
+        mProgressDialog.setMessage(getString(R.string.searching_repos));
+        mProgressDialog.setCancelable(false);
+        mProgressDialog.setCanceledOnTouchOutside(false);
 
         // Setup RecyclerView
         mRepoResultsRecyclerView.setHasFixedSize(true);
@@ -115,6 +126,14 @@ public class SearchActivity extends AppCompatActivity implements
 
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
+        }
+    }
+
     private void configureNavDrawer(final Toolbar toolbar) {
         DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout,
@@ -124,7 +143,6 @@ public class SearchActivity extends AppCompatActivity implements
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                toolbar.setTitle(R.string.search_activity_title);
                 if (mThankYouAnimator != null && mThankYouAnimator.isRunning()) {
                     cancelThankYouAnimation();
                 }
@@ -134,7 +152,6 @@ public class SearchActivity extends AppCompatActivity implements
             // Called when a drawer has settled in a completely open state
             @Override
             public void onDrawerOpened(View drawerView) {
-                Timber.d("[onDrawerOpened]");
                 super.onDrawerOpened(drawerView);
                 animateThankYou();
                 supportInvalidateOptionsMenu(); // creates a call to onPrepareOptionsMenu()
@@ -162,11 +179,12 @@ public class SearchActivity extends AppCompatActivity implements
     // Loader Stuff
     @Override
     public Loader<RepoCollection> onCreateLoader(int id, Bundle args) {
-        return new SearchResultLoader(this);
+        return new SearchResultLoader(this, mProgressDialog);
     }
 
     @Override
     public void onLoadFinished(Loader<RepoCollection> loader, RepoCollection data) {
+        Timber.d("[onLoadFinished]");
         if (data == null || data.getRepositories().isEmpty()) {
             showNoResults();
         } else {
@@ -262,10 +280,12 @@ public class SearchActivity extends AppCompatActivity implements
         private GithubService mGithubService;
         private RepoCollection mSearchResponse;
         private String mQuery;
+        private ProgressDialog mProgressDialog;
 
-        public SearchResultLoader(Context context) {
+        public SearchResultLoader(@NonNull Context context, @NonNull ProgressDialog progressDialog) {
             super(context);
             mGithubService = new GithubServiceFactory().getGithubService();
+            mProgressDialog = Preconditions.checkNotNull(progressDialog);
         }
 
         public void executeQuery(@NonNull String query) {
@@ -274,6 +294,8 @@ public class SearchActivity extends AppCompatActivity implements
                 // Returned cached response if the query is the same
                 deliverResult(mSearchResponse);
             } else {
+                // Show the progress dialog
+                mProgressDialog.show();
                 mQuery = query;
                 forceLoad();
             }
@@ -295,6 +317,10 @@ public class SearchActivity extends AppCompatActivity implements
         public void deliverResult(RepoCollection searchResponse) {
             // Cache results for later retrieval for identical back to back queries
             mSearchResponse = searchResponse;
+
+            // Dismiss the progress dialog
+            mProgressDialog.dismiss();
+
             super.deliverResult(searchResponse);
         }
 

@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Repo Find</string>
 
+    <!-- General -->
+    <string name="ok">Ok</string>
+
     <!-- Navigation Drawer -->
     <string name="nav_open">Open Drawer</string>
     <string name="nav_close">Close Drawer</string>
@@ -10,6 +13,10 @@
     <string name="search">Search</string>
     <string name="search_hint">Search repositories</string>
     <string name="empty_view_message">Search repositories</string>
+    <string name="no_results">No results found for %1$s.</string>
+    <string name="no_network_connection">%1$s needs a network connection to operate properly.
+        Please connect to a network and try again.</string>
+    <string name="searching_repos">Searching repositories…</string>
 
     <plurals name="search_results_found">
         <item quantity="one">Showing: %d result for</item>
@@ -18,9 +25,4 @@
 
     <!-- Thank You -->
     <string name="thanks">Thanks BookShout!</string>
-    <string name="no_results">No results found for %1$s.</string>
-    <string name="ok">Ok</string>
-    <string name="no_network_connection">%1$s needs a network connection to operate properly. Please connect to a network and try
-        again.
-    </string>
 </resources>
