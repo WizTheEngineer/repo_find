@@ -1,4 +1,4 @@
-# github_search
+# repo_find
 Sample app the implements the Github Search API.
 </br>
 <h2>Open Source Libraries Used</h2>
