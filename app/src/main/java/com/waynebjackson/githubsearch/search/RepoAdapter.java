@@ -15,6 +15,7 @@ import com.waynebjackson.githubsearch.R;
 import com.waynebjackson.githubsearch.data.model.Repo;
 import com.waynebjackson.githubsearch.networking.PicassoFactory;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -77,11 +78,9 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
         notifyDataSetChanged();
     }
 
-    private void setAnimation(View viewToAnimate, int position)
-    {
+    private void setAnimation(View viewToAnimate, int position) {
         // If the bound view wasn't previously displayed on screen, it's animated
-        if (position > mLastPosition)
-        {
+        if (position > mLastPosition) {
             Animation animation = AnimationUtils.loadAnimation(viewToAnimate.getContext(), android.R.anim.slide_in_left);
             viewToAnimate.startAnimation(animation);
             mLastPosition = position;
@@ -97,7 +96,11 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
         private TextView mStarCountView;
         private TextView mForkCountView;
         private TextView mWatcherCountView;
+        private TextView mRepoCreatedAtView;
         private TextView mLanguageView;
+
+        private SimpleDateFormat mDateFormat;
+
 
         public RepoViewHolder(View itemView) {
             super(itemView);
@@ -108,7 +111,10 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
             mStarCountView = (TextView) itemView.findViewById(R.id.star_count_view);
             mForkCountView = (TextView) itemView.findViewById(R.id.fork_count_view);
             mWatcherCountView = (TextView) itemView.findViewById(R.id.watcher_count_view);
+            mRepoCreatedAtView = (TextView) itemView.findViewById(R.id.repo_created_at_view);
             mLanguageView = (TextView) itemView.findViewById(R.id.repo_language_view);
+
+            mDateFormat = new SimpleDateFormat("MM/dd/yyyy");
         }
 
         public void bindRepo(@NonNull final Repo repository) {
@@ -122,6 +128,13 @@ public class RepoAdapter extends RecyclerView.Adapter<RepoAdapter.RepoViewHolder
             mStarCountView.setText(String.valueOf(repository.getStargazersCount()));
             mForkCountView.setText(String.valueOf(repository.getForksCount()));
             mWatcherCountView.setText(String.valueOf(repository.getWatchersCount()));
+
+            // Format the date
+            String createdDate = mDateFormat.format(repository.getCreatedAt());
+            String createdString = itemView.getContext().getString(R.string.created_on,
+                    createdDate);
+            mRepoCreatedAtView.setText(createdString);
+
             mLanguageView.setText(repository.getLanguage());
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

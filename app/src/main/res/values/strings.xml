@@ -23,6 +23,9 @@
         <item quantity="other">Showing: %d results for</item>
     </plurals>
 
+    <!-- Repos -->
+    <string name="created_on">Created on %1$s</string>
+
     <!-- Thank You -->
     <string name="thanks">Thanks BookShout!</string>
 </resources>

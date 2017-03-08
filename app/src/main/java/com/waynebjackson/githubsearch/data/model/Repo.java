@@ -1,5 +1,7 @@
 package com.waynebjackson.githubsearch.data.model;
 
+import java.util.Date;
+
 /**
  * Created by Wayne on 3/3/2017.
  * Model class representing a Github repository.
@@ -14,6 +16,7 @@ public class Repo {
     private int watchersCount;
     private String language;
     private int forksCount;
+    private Date createdAt;
 
     public long getId() {
         return id;
@@ -49,5 +52,9 @@ public class Repo {
 
     public int getForksCount() {
         return forksCount;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
     }
 }
