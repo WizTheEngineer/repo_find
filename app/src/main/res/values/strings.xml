@@ -25,7 +25,4 @@
 
     <!-- Repos -->
     <string name="created_on">Created on %1$s</string>
-
-    <!-- Thank You -->
-    <string name="thanks">Thanks BookShout!</string>
 </resources>

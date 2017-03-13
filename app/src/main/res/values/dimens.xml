@@ -32,5 +32,4 @@
     <dimen name="repo_count_size">12sp</dimen>
     <dimen name="repo_language_size">12sp</dimen>
     <dimen name="repo_icon_size">20dp</dimen>
-    <dimen name="nav_header_textsize">26sp</dimen>
 </resources>

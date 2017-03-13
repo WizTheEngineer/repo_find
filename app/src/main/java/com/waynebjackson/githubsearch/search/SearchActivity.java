@@ -1,10 +1,5 @@
 package com.waynebjackson.githubsearch.search;
 
-import java.io.IOException;
-import java.util.List;
-
-import com.google.common.base.Preconditions;
-
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.app.ProgressDialog;
@@ -32,15 +27,21 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.common.base.Preconditions;
 import com.waynebjackson.githubsearch.R;
 import com.waynebjackson.githubsearch.data.model.Repo;
 import com.waynebjackson.githubsearch.data.model.RepoCollection;
 import com.waynebjackson.githubsearch.data.service.GithubService;
 import com.waynebjackson.githubsearch.data.service.GithubServiceFactory;
 import com.waynebjackson.githubsearch.utils.NetworkUtils;
+
+import java.io.IOException;
+import java.util.List;
+
 import retrofit2.Call;
 import retrofit2.Response;
 import timber.log.Timber;
@@ -50,9 +51,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class SearchActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<RepoCollection>, RepoAdapter.RepoClickListener {
 
-    private static final float THANK_YOU_SCALE_FACTOR = 1.2f;
-    private static final long THANK_YOU_ANIMATION_DURATION = 315;
-    private static final int THANK_YOU_ANIMATION_PULSE_COUNT = 3;
+    private static final float OCTOFACE_SCALE_FACTOR = 1.2f;
+    private static final long OCTOFACE_ANIMATION_DURATION = 315;
+    private static final int OCTOFACE_PULSE_COUNT = 3;
 
     private TextView mResultsCountView;
     private RecyclerView mRepoResultsRecyclerView;
@@ -62,7 +63,7 @@ public class SearchActivity extends AppCompatActivity implements
 
     private SearchResultLoader mSearchResultLoader;
     private NavigationView mNavigationView;
-    private TextView mThankYouHeaderView;
+    private ImageView mOctoface;
 
     private ObjectAnimator mThankYouAnimator;
 
@@ -85,7 +86,7 @@ public class SearchActivity extends AppCompatActivity implements
         mRepoResultsRecyclerView = (RecyclerView) findViewById(R.id.repo_results_recyclerview);
         mEmptyView = (LinearLayout) findViewById(R.id.empty_view);
         mNavigationView = (NavigationView) findViewById(R.id.nav_view);
-        mThankYouHeaderView = (TextView) mNavigationView.getHeaderView(0).findViewById(R.id.thankyou_header_view);
+        mOctoface = (ImageView) mNavigationView.getHeaderView(0).findViewById(R.id.octoface);
 
         mProgressDialog= new ProgressDialog(this, R.style.AppTheme_Dark_Dialog);
         mProgressDialog.setIndeterminate(true);
@@ -235,13 +236,13 @@ public class SearchActivity extends AppCompatActivity implements
     // Animations
     private void animateThankYou() {
         if (mThankYouAnimator == null) {
-            mThankYouAnimator = ObjectAnimator.ofPropertyValuesHolder(mThankYouHeaderView,
-                                                                      PropertyValuesHolder.ofFloat("scaleX", THANK_YOU_SCALE_FACTOR),
-                                                                      PropertyValuesHolder.ofFloat("scaleY", THANK_YOU_SCALE_FACTOR));
+            mThankYouAnimator = ObjectAnimator.ofPropertyValuesHolder(mOctoface,
+                                                                      PropertyValuesHolder.ofFloat("scaleX", OCTOFACE_SCALE_FACTOR),
+                                                                      PropertyValuesHolder.ofFloat("scaleY", OCTOFACE_SCALE_FACTOR));
             mThankYouAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-            mThankYouAnimator.setDuration(THANK_YOU_ANIMATION_DURATION);
+            mThankYouAnimator.setDuration(OCTOFACE_ANIMATION_DURATION);
 
-            mThankYouAnimator.setRepeatCount(THANK_YOU_ANIMATION_PULSE_COUNT);
+            mThankYouAnimator.setRepeatCount(OCTOFACE_PULSE_COUNT);
             mThankYouAnimator.setRepeatMode(ObjectAnimator.REVERSE);
         }
         mThankYouAnimator.start();
@@ -249,8 +250,8 @@ public class SearchActivity extends AppCompatActivity implements
 
     private void cancelThankYouAnimation() {
         mThankYouAnimator.cancel();
-        mThankYouHeaderView.setScaleX(1f);
-        mThankYouHeaderView.setScaleY(1f);
+        mOctoface.setScaleX(1f);
+        mOctoface.setScaleY(1f);
     }
 
     // No Network
