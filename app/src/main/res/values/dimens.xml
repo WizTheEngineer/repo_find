@@ -7,6 +7,7 @@
     <!-- Navigation -->
     <dimen name="nav_drawer_width">300dp</dimen>
     <dimen name="nav_header_height">125dp</dimen>
+    <dimen name="nav_octoface_size">64dp</dimen>
 
     <!-- General -->
     <dimen name="spacing_small">4dp</dimen>

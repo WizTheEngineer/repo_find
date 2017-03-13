@@ -8,8 +8,8 @@
               android:background="@color/colorAccent">
     <ImageView
         android:id="@+id/octoface"
-        android:layout_width="64dp"
-        android:layout_height="64dp"
+        android:layout_width="@dimen/nav_octoface_size"
+        android:layout_height="@dimen/nav_octoface_size"
         android:textColor="@android:color/white"
         app:srcCompat="@drawable/octoface"/>
 </LinearLayout>
