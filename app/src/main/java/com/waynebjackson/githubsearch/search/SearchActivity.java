@@ -65,7 +65,7 @@ public class SearchActivity extends AppCompatActivity implements
     private NavigationView mNavigationView;
     private ImageView mOctoface;
 
-    private ObjectAnimator mThankYouAnimator;
+    private ObjectAnimator mOctofaceAnimator;
 
     private ProgressDialog mProgressDialog;
 
@@ -144,7 +144,7 @@ public class SearchActivity extends AppCompatActivity implements
             @Override
             public void onDrawerClosed(View drawerView) {
                 super.onDrawerClosed(drawerView);
-                if (mThankYouAnimator != null && mThankYouAnimator.isRunning()) {
+                if (mOctofaceAnimator != null && mOctofaceAnimator.isRunning()) {
                     cancelThankYouAnimation();
                 }
                 supportInvalidateOptionsMenu(); // creates a call to onPrepareOptionsMenu();
@@ -235,21 +235,21 @@ public class SearchActivity extends AppCompatActivity implements
 
     // Animations
     private void animateThankYou() {
-        if (mThankYouAnimator == null) {
-            mThankYouAnimator = ObjectAnimator.ofPropertyValuesHolder(mOctoface,
+        if (mOctofaceAnimator == null) {
+            mOctofaceAnimator = ObjectAnimator.ofPropertyValuesHolder(mOctoface,
                                                                       PropertyValuesHolder.ofFloat("scaleX", OCTOFACE_SCALE_FACTOR),
                                                                       PropertyValuesHolder.ofFloat("scaleY", OCTOFACE_SCALE_FACTOR));
-            mThankYouAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-            mThankYouAnimator.setDuration(OCTOFACE_ANIMATION_DURATION);
+            mOctofaceAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+            mOctofaceAnimator.setDuration(OCTOFACE_ANIMATION_DURATION);
 
-            mThankYouAnimator.setRepeatCount(OCTOFACE_PULSE_COUNT);
-            mThankYouAnimator.setRepeatMode(ObjectAnimator.REVERSE);
+            mOctofaceAnimator.setRepeatCount(OCTOFACE_PULSE_COUNT);
+            mOctofaceAnimator.setRepeatMode(ObjectAnimator.REVERSE);
         }
-        mThankYouAnimator.start();
+        mOctofaceAnimator.start();
     }
 
     private void cancelThankYouAnimation() {
-        mThankYouAnimator.cancel();
+        mOctofaceAnimator.cancel();
         mOctoface.setScaleX(1f);
         mOctoface.setScaleY(1f);
     }
